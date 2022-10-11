@@ -45,10 +45,10 @@ const Signup = () => {
       .then((res) => {
         if (res) {
           router.push("/dashboard");
-          setState(reset_value);
         }
       })
       .catch((e) => console.error(e));
+    setState(reset_value);
   };
 
   const onChangeHandler = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +130,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.log(cookies.token);
     return {
       redirect: {
-        destination: "/",
+        destination: "/dashboard",
         permanent: false,
       },
     };

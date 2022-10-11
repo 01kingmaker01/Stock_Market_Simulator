@@ -1,3 +1,4 @@
+import { GetServerSideProps } from "next";
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -8,19 +9,43 @@ import {
   Input,
   SubmitBtn,
 } from "./signup";
+import nookies from "nookies";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 const Signin = () => {
-  const reset_value = {
+  interface reset_type {
+    username: string;
+
+    password: string;
+  }
+
+  const reset_value: reset_type = {
     username: "",
     password: "",
   };
   const [state, setState] = useState(reset_value);
 
-  const onSubmitHandler = (e: { preventDefault: () => void }) => {
+  const router = useRouter();
+
+  const onSubmitHandler = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
-    console.log("Submiteed", state);
-
+    await axios
+      .post("http://localhost:3000/api/user/login", {
+        username: state.username,
+        password: state.password,
+      })
+      .then((response) => {
+        if (response) {
+          router.push("/dashboard");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
     setState(reset_value);
   };
 
@@ -67,9 +92,30 @@ const Signin = () => {
             value={state.password}
           />
         </InnCon>
-        <SubmitBtn type="submit">Register</SubmitBtn>
+        <SubmitBtn type="submit">Log In</SubmitBtn>
       </Form>
     </OuterContainer>
   );
 };
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { req } = context;
+
+  const cookies = nookies.get({ req });
+
+  if (cookies.token) {
+    console.log(cookies.token);
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
+
 export default Signin;

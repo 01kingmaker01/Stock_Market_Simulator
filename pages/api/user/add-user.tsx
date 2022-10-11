@@ -10,7 +10,6 @@ const secret = "SECRET";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { email, username, password, name } = req.body;
-    console.log(email);
     //Connectiong to the mongodb collections.
 
     await Wrapper(async () => {
